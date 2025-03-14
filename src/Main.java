@@ -12,6 +12,7 @@ public class Main {
 
 
         MazeSolve newMaze = new MazeSolve(maze[0].length, maze.length, maze );
+        System.out.println(newMaze.solveMaze());
 
     }
     public static String[][] getMaze(String fileName) {
