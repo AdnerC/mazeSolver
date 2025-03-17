@@ -10,6 +10,7 @@ public class MazeSolve{
     private Coordinate end;
 
     public MazeSolve(int x, int y, String[][] grid){
+        forks =new ArrayList<Coordinate>();
          end = new Coordinate(y-1, x-1);
         System.out.println(x+", "+y);
         maze = grid;
@@ -108,7 +109,7 @@ public class MazeSolve{
         return "how";
     }
 
-    public boolean hasFork(){
+    public int hasFork(){
         int count =0;
         if(canMoveLeft() && !directionFrom().equals("Left")){
                 count++;
@@ -123,12 +124,10 @@ public class MazeSolve{
         if(canMoveDown()&& !directionFrom().equals("Down")){
             count++;
         }
-        if(count>1){
-            forks.add(currentPosition);
-            return true;
-        }else {
-            return false;
-        }
+
+        return count;
+
+
     }
 
 
@@ -136,8 +135,6 @@ public class MazeSolve{
 
     public String solveMaze(){
         Coordinate start = new Coordinate(0,0);
-
-
         boolean win =false;
         steps.add(start);
         int count = 0;
@@ -145,10 +142,36 @@ public class MazeSolve{
 
 
         while (!win){
+            boolean fork =false;
+            boolean deadEnd =false;
             boolean hasMoved =false;
+
             System.out.println("________");
+            System.out.println("CURRENT POS: ");
+
+            System.out.println(currentPosition);
+            System.out.println();
+            if(!forks.isEmpty()) {
+                System.out.println("FORKS: ");
+                System.out.println(forks);
+            }
 
             System.out.println("______");
+            System.out.println("NUM OF POSSIBLE DIRECTIONS:");
+            System.out.println(hasFork());
+            if(hasFork()>1){
+                Coordinate newCord = new Coordinate(currentPosition.getRow(), currentPosition.getColumn());
+                System.out.println("fork detected");
+                forks.add(newCord);
+            }
+
+            if(hasFork()==0){
+                System.out.println("dead end detected");
+                deadEnd =true;
+                currentPosition.setColumn(forks.getLast().getColumn());
+                currentPosition.setRow(forks.getLast().getRow());
+            }
+            System.out.println("DIRECTION: ");
 
             if(!hasMoved && canMoveLeft() && !directionFrom().equals("Left")){
                 moveLeft();
@@ -176,11 +199,10 @@ public class MazeSolve{
 
             }
 
-            if(currentPosition.toString().equals(end.toString())){
+            if(currentPosition.toString().equals(end.toString())||count==10){
                 win=true;
             }
             count++;
-            hasMoved=false;
 
         }
 
