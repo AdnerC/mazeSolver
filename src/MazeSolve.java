@@ -130,6 +130,21 @@ public class MazeSolve{
 
     }
 
+    public void addFork(ArrayList<String> fork){
+        if(canMoveLeft() && !directionFrom().equals("Left")){
+            fork.add("Left");
+        }
+        if(canMoveRight()&& !directionFrom().equals("Right")){
+            fork.add("Right");
+        }
+        if(canMoveUp() && !directionFrom().equals("Up")){
+            fork.add("Up");
+        }
+        if(canMoveDown()&& !directionFrom().equals("Down")){
+            fork.add("Down");
+        }
+    }
+
 
 
 
@@ -138,8 +153,7 @@ public class MazeSolve{
         boolean win =false;
         steps.add(start);
         int count = 0;
-
-
+        ArrayList<String> forkDirections = new ArrayList<>();
 
         while (!win){
             boolean fork =false;
@@ -155,7 +169,9 @@ public class MazeSolve{
                 System.out.println("FORKS: ");
                 System.out.println(forks);
             }
-
+            System.out.println("_______________________");
+            System.out.println("POSSIBLE FORK MOVEMENT: ");
+            System.out.println(forkDirections.toString());
             System.out.println("______");
             System.out.println("NUM OF POSSIBLE DIRECTIONS:");
             System.out.println(hasFork());
