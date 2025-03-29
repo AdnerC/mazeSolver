@@ -10,9 +10,7 @@ public class MazeSolve{
     private Coordinate end;
 
     public MazeSolve(int x, int y, String[][] grid){
-        forks =new ArrayList<Coordinate>();
-         end = new Coordinate(y-1, x-1);
-        System.out.println(x+", "+y);
+        end = new Coordinate(y-1, x-1);
         maze = grid;
         steps= new ArrayList<Coordinate>();
         currentPosition= new Coordinate(0,0);
@@ -94,131 +92,119 @@ public class MazeSolve{
         if (currentPosition.toString().equals(start.toString())){
             return "Nowhere";
         }
-        if(!steps.isEmpty() && steps.get(steps.size()-2).getColumn()==currentPosition.getColumn()-1){
-            return "Left";
-        }
-        if(!steps.isEmpty()&&steps.get(steps.size()-2).getColumn()==currentPosition.getColumn()+1){
-            return "Right";
-        }
-        if(!steps.isEmpty() && steps.get(steps.size()-2).getRow()==currentPosition.getRow()-1){
-            return "Up";
-        }
-        if(!steps.isEmpty() && steps.get(steps.size()-2).getRow()==currentPosition.getRow()+1){
-            return "Down";
+        if (steps.size() > 1) {
+
+            if (!steps.isEmpty() && steps.get(steps.size() - 2).getColumn() == currentPosition.getColumn() - 1) {
+                return "Left";
+            }
+            if (!steps.isEmpty() && steps.get(steps.size() - 2).getColumn() == currentPosition.getColumn() + 1) {
+                return "Right";
+            }
+            if (!steps.isEmpty() && steps.get(steps.size() - 2).getRow() == currentPosition.getRow() - 1) {
+                return "Up";
+            }
+            if (!steps.isEmpty() && steps.get(steps.size() - 2).getRow() == currentPosition.getRow() + 1) {
+                return "Down";
+            }
         }
         return "how";
     }
 
-    public int hasFork(){
-        int count =0;
-        if(canMoveLeft() && !directionFrom().equals("Left")){
-                count++;
+    public boolean isDeadEnd() {
+        String directionCameFrom = directionFrom();
+
+        // If all directions are blocked except the direction from which we came
+        if ("Up".equals(directionCameFrom)) {
+            return !(canMoveLeft() || canMoveRight() || canMoveDown());
+        }
+        if ("Down".equals(directionCameFrom)) {
+            return !(canMoveLeft() || canMoveRight() || canMoveUp());
+        }
+        if ("Left".equals(directionCameFrom)) {
+            return !(canMoveUp() || canMoveDown() || canMoveRight());
+        }
+        if ("Right".equals(directionCameFrom)) {
+            return !(canMoveUp() || canMoveDown() || canMoveLeft());
         }
 
-        if(canMoveRight()&& !directionFrom().equals("Right")){
-            count++;
-        }
-        if(canMoveUp() && !directionFrom().equals("Up")){
-            count++;
-        }
-        if(canMoveDown()&& !directionFrom().equals("Down")){
-            count++;
-        }
-
-        return count;
-
-
+        return !(canMoveUp() || canMoveDown() || canMoveLeft() || canMoveRight());
     }
 
-    public void addFork(ArrayList<String> fork){
-        if(canMoveLeft() && !directionFrom().equals("Left")){
-            fork.add("Left");
-        }
-        if(canMoveRight()&& !directionFrom().equals("Right")){
-            fork.add("Right");
-        }
-        if(canMoveUp() && !directionFrom().equals("Up")){
-            fork.add("Up");
-        }
-        if(canMoveDown()&& !directionFrom().equals("Down")){
-            fork.add("Down");
-        }
-    }
+
+
+
 
 
 
 
     public String solveMaze(){
+
         Coordinate start = new Coordinate(0,0);
+        boolean deadEnd =false;
+
+
         boolean win =false;
+
         steps.add(start);
         int count = 0;
-        ArrayList<String> forkDirections = new ArrayList<>();
+
+
+
 
         while (!win){
-            boolean fork =false;
-            boolean deadEnd =false;
+
             boolean hasMoved =false;
+            if(deadEnd){
+                currentPosition.setRow(0);
+                currentPosition.setColumn(0);
+                deadEnd = false;
 
-            System.out.println("________");
-            System.out.println("CURRENT POS: ");
 
-            System.out.println(currentPosition);
-            System.out.println();
-            if(!forks.isEmpty()) {
-                System.out.println("FORKS: ");
-                System.out.println(forks);
-            }
-            System.out.println("_______________________");
-            System.out.println("POSSIBLE FORK MOVEMENT: ");
-            System.out.println(forkDirections.toString());
-            System.out.println("______");
-            System.out.println("NUM OF POSSIBLE DIRECTIONS:");
-            System.out.println(hasFork());
-            if(hasFork()>1){
-                Coordinate newCord = new Coordinate(currentPosition.getRow(), currentPosition.getColumn());
-                System.out.println("fork detected");
-                forks.add(newCord);
             }
 
-            if(hasFork()==0){
-                System.out.println("dead end detected");
-                deadEnd =true;
-                currentPosition.setColumn(forks.getLast().getColumn());
-                currentPosition.setRow(forks.getLast().getRow());
+            if(isDeadEnd()){
+                deadEnd=true;
+                maze[currentPosition.getRow()][currentPosition.getColumn()] = "#";
+//                System.out.println("Wall placed at "+currentPosition.toString());
+                for(int i =0 ; i<count;i++){
+                    if(!steps.isEmpty()) {
+                        steps.remove(steps.size()-1);
+                    }
+                }
             }
-            System.out.println("DIRECTION: ");
 
-            if(!hasMoved && canMoveLeft() && !directionFrom().equals("Left")){
+            if(!hasMoved && canMoveLeft() && !directionFrom().equals("Left")&&!deadEnd){
                 moveLeft();
-                System.out.println("left");
-                 hasMoved =true;
+                hasMoved =true;
+                count++;
 
             }
 
-            if(!hasMoved && canMoveRight()&& !directionFrom().equals("Right")){
+            if(!hasMoved && canMoveRight()&& !directionFrom().equals("Right")&&!deadEnd){
                 moveRight();
-                System.out.println("right");
                 hasMoved =true;
+                count++;
 
             }
-            if(!hasMoved && canMoveUp() && !directionFrom().equals("Up")){
+            if(!hasMoved && canMoveUp() && !directionFrom().equals("Up")&&!deadEnd){
                 moveUp();
-                System.out.println("up");
                 hasMoved =true;
+                count++;
 
             }
-            if(!hasMoved && canMoveDown()&& !directionFrom().equals("Down")){
+            if(!hasMoved && canMoveDown()&& !directionFrom().equals("Down")&&!deadEnd){
                 moveDown();
-                System.out.println("down");
                 hasMoved =true;
+                count++;
 
             }
 
-            if(currentPosition.toString().equals(end.toString())||count==10){
+
+            if(currentPosition.toString().equals(end.toString())){
                 win=true;
             }
-            count++;
+
+            hasMoved=false;
 
         }
 
@@ -227,7 +213,8 @@ public class MazeSolve{
         for(Coordinate coord :steps){
             stepsText+=coord.toString()+" --> ";
         }
-        return stepsText;
+        return (stepsText.substring(11,stepsText.length()-5));
+
     }
 
 
