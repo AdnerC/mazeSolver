@@ -138,6 +138,7 @@ public class MazeSolve{
 
 
     public String solveMaze(){
+        boolean hasFork = false;
 
         Coordinate start = new Coordinate(0,0);
         boolean deadEnd =false;
@@ -171,6 +172,7 @@ public class MazeSolve{
                         steps.remove(steps.size()-1);
                     }
                 }
+                hasFork=true;
             }
 
             if(!hasMoved && canMoveLeft() && !directionFrom().equals("Left")&&!deadEnd){
@@ -209,9 +211,12 @@ public class MazeSolve{
         }
 
         String stepsText = "";
+        if(!hasFork){
+            stepsText+=start.toString()+" ---> ";
+        }
 
         for(Coordinate coord :steps){
-            stepsText+=coord.toString()+" --> ";
+            stepsText+=coord.toString()+" ---> ";
         }
         return (stepsText.substring(11,stepsText.length()-5));
 
